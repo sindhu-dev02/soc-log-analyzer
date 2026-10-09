@@ -4,6 +4,39 @@ A command-line tool that reads Linux SSH authentication logs and web server
 access logs and flags suspicious login activity. Detections are tagged with
 MITRE ATT&CK techniques. Built as a learning project with sample data.
 
+## Sample Output
+
+Run the analyzer with:
+```
+python analyze.py
+```
+
+Example output:
+
+```
+Total failed logins per IP:
+  198.51.100.99      6
+  203.0.113.5        5
+  192.0.2.10         1
+  192.0.2.11         1
+  192.0.2.12         1
+  192.0.2.13         1
+  192.0.2.14         1
+
+Alerts:
+  Line 11: CRITICAL - 203.0.113.5 logged in as 'root' after 5 failures in the last 60s
+      rule: success_after_failures | ATT&CK: T1110 Brute Force
+      evidence: Oct  8 03:14:40 web01 sshd[1500]: Accepted password for root from 203.0.113.5 port 52200 ssh2
+  Line 17: HIGH - 198.51.100.99 tried 5 different usernames within 300s (admin, oracle, postgres, test, ubuntu)
+      rule: many_usernames | ATT&CK: T1110.003 Password Spraying
+      evidence: Oct  8 03:20:17 web01 sshd[1600]: Failed password for invalid user ubuntu from 198.51.100.99 port 41008 ssh2
+  Line 24: HIGH - account 'root' failed logins from 5 different IPs within 300s
+      rule: distributed_attack | ATT&CK: T1110.004 Credential Stuffing
+      evidence: Oct  8 03:25:40 web01 sshd[1704]: Failed password for root from 192.0.2.14 port 40005 ssh2
+
+Parsed 20 events, skipped 1 unreadable line(s).
+```
+
 ## What it detects
 
 | Rule | Severity | ATT&CK | Trigger |
